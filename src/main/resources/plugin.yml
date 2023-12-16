@@ -1,0 +1,8 @@
+name: CustomItems
+version: '${version}'
+main: ru.olejka.customitems.CustomItems
+api-version: '1.20'
+prefix: [OCCI]
+authors: [Olejka]
+description: Plugin for cutom items
+website: https://olejka.ru/
