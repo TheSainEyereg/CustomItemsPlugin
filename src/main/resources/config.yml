@@ -1,0 +1,6 @@
+cooldowns:
+  - type: FEATHER
+    time: 120
+    eiid: smoke_small
+
+bell:
