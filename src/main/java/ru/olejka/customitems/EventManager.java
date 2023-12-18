@@ -24,7 +24,6 @@ public class EventManager implements Listener {
 		var material = item.getType();
 
 		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			event.setCancelled(true);
 			logger.info("Right click");
 
 			if (player.hasCooldown(material)) return;
