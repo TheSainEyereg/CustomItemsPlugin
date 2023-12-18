@@ -1,6 +1,7 @@
-cooldowns:
+items:
   - type: FEATHER
-    time: 120
     eiid: smoke_small
+    cooldown: 120
+    sharable: false
 
 bell:

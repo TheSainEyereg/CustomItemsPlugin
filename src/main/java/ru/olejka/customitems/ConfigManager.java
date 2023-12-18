@@ -9,46 +9,54 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.List;
 
-class CDDefinition {
+class ItemDefinition {
 	private final Material material;
-	private final int time;
+	private final int cooldown;
 	private final String eiid;
 
-	public CDDefinition(Material material, int time, String eiid) {
+	private final boolean sharable;
+
+	public ItemDefinition(Material material, int cooldown, String eiid, boolean sharable) {
 		this.material = material;
-		this.time = time;
+		this.cooldown = cooldown;
 		this.eiid = eiid;
+		this.sharable = sharable;
 	}
 
 	public Material getMaterial() {
 		return material;
 	}
 
-	public int getTime() {
-		return time;
+	public int getCooldown() {
+		return cooldown;
 	}
 
 	public String getEiid() {
 		return eiid;
 	}
+
+	public boolean isSharable() {
+		return sharable;
+	}
 }
 
 public class ConfigManager {
-	private static final List<CDDefinition> cooldowns = new ArrayList<>();
+	private static final List<ItemDefinition> items = new ArrayList<>();
 
 	public static void parseConfig(FileConfiguration config) {
-		for(var cd : config.getMapList("cooldowns")) {
-			var cdMaterial = Material.getMaterial((String) cd.get("type"));
-			var cdTime = cd.get("time");
-			var cdEiid = cd.get("eiid");
+		for(var ci : config.getMapList("items")) {
+			var ciMaterial = Material.getMaterial((String) ci.get("type"));
+			var ciCooldown = ci.get("cooldown");
+			var ciEiid = ci.get("eiid");
+			var ciSharable = ci.get("sharable");
 
-			if (cdMaterial == null || cdEiid == null || cdTime == null) continue;
+			if (ciMaterial == null || ciEiid == null || ciCooldown == null) continue;
 
-			cooldowns.add(new CDDefinition(cdMaterial, (int) cdTime, (String) cdEiid));
+			items.add(new ItemDefinition(ciMaterial, (int) ciCooldown, (String) ciEiid, ciSharable == null || (boolean) ciSharable));
 		}
 	}
 
-	public static CDDefinition getCooldownItem(ItemStack item) {
+	public static ItemDefinition getItem(ItemStack item) {
 		var material = item.getType();
 
 		var meta = item.getItemMeta();
@@ -57,13 +65,9 @@ public class ConfigManager {
 		var eiid = meta.getPersistentDataContainer().get(NamespacedKey.fromString("executableitems:ei-id"), PersistentDataType.STRING);
 		if (eiid == null) return null;
 
-		for(var cd : cooldowns) {
-			if (cd.getMaterial().equals(material) && cd.getEiid().equals(eiid)) return cd;
+		for(var ci : items) {
+			if (ci.getMaterial().equals(material) && ci.getEiid().equals(eiid)) return ci;
 		}
 		return null;
-	}
-
-	public static List<CDDefinition> getCooldowns() {
-		return cooldowns;
 	}
 }
