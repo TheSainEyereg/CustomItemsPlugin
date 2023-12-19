@@ -130,28 +130,28 @@ public class EventManager implements Listener {
 		bellEntity.update();
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBellBreak(final BlockBreakEvent event) {
-		var block = event.getBlock();
-		if (!block.getType().equals(Material.BELL)) return;
-
-		var bellEntity = (Bell) block.getState();
-		var bellData = bellEntity.getPersistentDataContainer();
-		var key = NamespacedKey.fromString("ci:bell-meta");
-		if (key == null) return;
-
-		var meta = bellData.get(key, PersistentDataType.STRING);
-		if (meta == null) return;
-
-		var item = new ItemStack(Material.BELL);
-
-		event.setDropItems(false);
-		block.getDrops(item).clear();
-
-		var player = event.getPlayer();
-		var world = player.getWorld();
-		world.dropItemNaturally(block.getLocation(), item);
-	}
+//	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+//	public void onBellBreak(final BlockBreakEvent event) {
+//		var block = event.getBlock();
+//		if (!block.getType().equals(Material.BELL)) return;
+//
+//		var bellEntity = (Bell) block.getState();
+//		var bellData = bellEntity.getPersistentDataContainer();
+//		var key = NamespacedKey.fromString("ci:bell-meta");
+//		if (key == null) return;
+//
+//		var meta = bellData.get(key, PersistentDataType.STRING);
+//		if (meta == null) return;
+//
+//		var item = new ItemStack(Material.BELL);
+//
+//		event.setDropItems(false);
+//		block.getDrops(item).clear();
+//
+//		var player = event.getPlayer();
+//		var world = player.getWorld();
+//		world.dropItemNaturally(block.getLocation(), item);
+//	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBellRing(final PlayerInteractEvent event) {
@@ -180,23 +180,6 @@ public class EventManager implements Listener {
 		var effectTime = bellConfig.getEffectTime();
 		var cooldown = bellConfig.getCooldown();
 
-		// Create team
-		var scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		var time = new Date().getTime();
-		var invisibleTteam = scoreboard.registerNewTeam("ci-bell-" + time);
-		invisibleTteam.color(NamedTextColor.RED);
-
-		// Get players near bell
-		var player = event.getPlayer();
-		var players = block.getLocation().getNearbyPlayers(radius).stream().filter(p -> p != player).toList();
-		if (players.isEmpty()) return;
-
-		for (var p : players) {
-			if (!p.isOnline()) continue;
-			if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) invisibleTteam.addEntity(p);
-			p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, effectTime * 20, 0, false, false));
-		}
-
 		// Add cooldown & delay removal
 		bellRanged.add(block);
 		new BukkitRunnable() {
@@ -205,6 +188,22 @@ public class EventManager implements Listener {
 				bellRanged.remove(block);
 			}
 		}.runTaskLaterAsynchronously(CustomItems.getPlugin(CustomItems.class), cooldown * 20L);
+
+		// Get players near bell
+		var player = event.getPlayer();
+		var players = block.getLocation().getNearbyPlayers(radius).stream().filter(p -> p != player).toList();
+		if (players.isEmpty()) return;
+
+		// Create team
+		var scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		var invisibleTteam = scoreboard.registerNewTeam("ci-bell-" + new Date().getTime());
+		invisibleTteam.color(NamedTextColor.RED);
+
+		for (var p : players) {
+			if (!p.isOnline()) continue;
+			if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) invisibleTteam.addEntity(p);
+			p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, effectTime * 20, 0, false, false));
+		}
 
 		// Delay team removal
 		new BukkitRunnable() {
