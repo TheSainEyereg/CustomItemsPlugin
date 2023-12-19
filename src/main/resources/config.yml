@@ -5,3 +5,7 @@ items:
     sharable: false
 
 bell:
+  radius: 200
+  effect_time: 15
+  cooldown: 15
+  lore_ident: Разрешенный Предмет!
