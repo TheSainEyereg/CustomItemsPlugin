@@ -1,6 +1,5 @@
 package ru.olejka.customitems;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

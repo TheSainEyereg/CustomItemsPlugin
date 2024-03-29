@@ -59,7 +59,7 @@ class BellDefinition {
 		var meta = item.getItemMeta();
 		if (meta == null) return false;
 
-		var lore = meta.lore();
+		var lore = meta.getLore();
 		return lore != null && lore.toString().contains(loreIdent);
 	}
 
